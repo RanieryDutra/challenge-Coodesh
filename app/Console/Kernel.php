@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('process:database-import')->daily();
+        $schedule->command('process:database-import')->daily();
         // $schedule->command('inspire')->hourly();
     }
 
