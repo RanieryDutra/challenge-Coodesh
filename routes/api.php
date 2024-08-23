@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +18,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+// Route::get('/', [ApiController::class, 'ApiDetails']);
+// Route::put('/products/{code}', [ProductController::class, 'productUpdate']);
+// Route::delete('/products/{code}', [ProductController::class, 'productDelete']);
+// Route::get('/products/{code}', [ProductController::class, 'productGet']); //ok
+// Route::get('/products', [ProductController::class, 'allProducts']);
+
+Route::get('/', [ProductController::class, 'index']);                       //ok
+Route::put('/products/{code}', [ProductController::class, 'update']);       //ok
+Route::delete('/products/{code}', [ProductController::class, 'delete']);    //ok
+Route::get('/products/{code}', [ProductController::class, 'show']);         //ok
+Route::get('/products', [ProductController::class, 'list']);                //ok
