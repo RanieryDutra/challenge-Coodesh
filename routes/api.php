@@ -22,12 +22,6 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-// Route::get('/', [ApiController::class, 'ApiDetails']);
-// Route::put('/products/{code}', [ProductController::class, 'productUpdate']);
-// Route::delete('/products/{code}', [ProductController::class, 'productDelete']);
-// Route::get('/products/{code}', [ProductController::class, 'productGet']); //ok
-// Route::get('/products', [ProductController::class, 'allProducts']);
-
 Route::get('/', [ProductController::class, 'index']);                       //ok
 Route::put('/products/{code}', [ProductController::class, 'update']);       //ok
 Route::delete('/products/{code}', [ProductController::class, 'delete']);    //ok
