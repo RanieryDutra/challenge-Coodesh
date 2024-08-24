@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
-            $table->enum('status', ['draft', 'trash', 'published']);
+            $table->string('code')->index();
+            $table->enum('status', ['draft', 'trash', 'published'])->index();
             $table->dateTime('imported_t');
             $table->string('url',1000)->nullable();
             $table->string('creator')->nullable();
