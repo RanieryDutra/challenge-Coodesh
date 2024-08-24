@@ -64,7 +64,7 @@ class DatabaseImportProcess extends Command
         $file       = fopen($filePath, 'r');
         $lineNumber = 0;
 
-        while (!feof($file) && $lineNumber < 100) {
+        while (!feof($file) && $lineNumber < config('coodesh.import_limit_file_lines')) {
             $line     = fgets($file);
             $dataJson = json_decode($line, true);
             $data     = [
