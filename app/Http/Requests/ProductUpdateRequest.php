@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Validator;
 
 class ProductUpdateRequest extends FormRequest
 {
@@ -22,7 +24,7 @@ class ProductUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status'           => 'sometimes|string',
+            'status'           => 'sometimes|string|in:trash,draft,published',
             'url'              => 'sometimes|string',
             'creator'          => 'sometimes|string',
             'created_t'        => 'sometimes|date',
@@ -43,5 +45,16 @@ class ProductUpdateRequest extends FormRequest
             'main_category'    => 'sometimes|string',
             'image_url'        => 'sometimes|string|url',
         ];
+    }
+
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        $errors = $validator->errors();
+
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $errors
+        ], 422));
     }
 }

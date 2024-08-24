@@ -76,7 +76,7 @@ class DatabaseImportProcess extends Command
                 'created_t'        => Carbon::createFromTimestamp($dataJson['created_t']),
                 'last_modified_t'  => Carbon::createFromTimestamp($dataJson['last_modified_t']),
                 'product_name'     => $dataJson['product_name'],
-                'quantity'         => $dataJson['quantity'],
+                'quantity'         => empty($dataJson['quantity']) ? 0 : intval($dataJson['quantity']),
                 'brands'           => $dataJson['brands'],
                 'categories'       => $dataJson['categories'],
                 'labels'           => $dataJson['labels'],
