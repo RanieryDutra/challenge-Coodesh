@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductFilterRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\CronLog;
@@ -119,10 +120,18 @@ class ProductController extends Controller
     }
 
 
-    public function list(Request $request)
+    public function list(ProductFilterRequest $request)
     {
         try {
-            $products = Product::query()->paginate(10);
+            $filters      = $request->validated();
+            $productQuery = Product::query();
+            if (!empty($filters['status'])) {
+                $productQuery->where('status', $filters['status']);
+            }
+            if (!empty($filters['product_name'])) {
+                $productQuery->where('product_name', 'like', '%' . $filters['product_name'] . '%');
+            }
+            $products = $productQuery->paginate(10);
             return response()->json(ProductResource::collection($products), 200);
 
         } catch (\Exception $e) {
