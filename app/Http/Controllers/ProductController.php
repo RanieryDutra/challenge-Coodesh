@@ -2,115 +2,134 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductUpdateRequest;
+use App\Models\CronLog;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        try
-        {
-            $status = 'API is working';
-            $lastCronExecution = Carbon::now('America/Sao_Paulo')->toDateTimeString();
-            $memoryUsage = memory_get_usage();
-    
-            return response()->json([
-                'status' => $status,
-                'last_cron_execution' => $lastCronExecution,
-                'memory_usage' => $memoryUsage,
-            ], 200);
-    
-        } catch (\Exception $e)
-        {
-            return response()->json([
-                'error' => 'An error occurred while processing the request',
-                'message' => $e->getMessage(),
-            ], 500);
-        }
-    }
-    
-
-    public function update(Request $request, $code)
-    {
-        try 
-        {
-            $product = Product::where('code', $code)->update($request->all());
-            $productAtt = Product::where('code', $code)->firstOrFail();
-            return response()->json($productAtt, 200);
-
-        } catch (\Exception $e) 
-        {
-            return response()->json([
-                'error' => 'Error updating product',
-                'message' => $e->getMessage(),
-            ], 500);
-        }
-    }
-    
-
-    public function delete($code)
-    {
-        try
-        {
-            $product = Product::where('code', $code)->update(['status' => 'trash']);
-    
-            if ($product) {
-                return response()->json(['status' => 'trash'], 200);
-            } else {
-                return response()->json(['error' => 'Product not found or unable to delete'], 404);
+        try {
+            try {
+                DB::connection()->getPdo();
+                $checkDBReadConnection = 'OK';
+            } catch (\Exception $e) {
+                $checkDBReadConnection = 'Failed: ' . $e->getMessage();
             }
-    
-        } catch (\Exception $e)
-        {
+            // Verificar conexão de escrita com o banco de dados
+            try {
+                DB::connection()->getPdo()->exec('DO 1');
+                $checkDBWriteConnection = 'OK';
+            } catch (\Exception $e) {
+                $checkDBWriteConnection = 'Failed: ' . $e->getMessage();
+            }
+            $lastCron         = CronLog::query()->orderBy('id', 'desc')->first();
+            $lastCronExecuted = $lastCron ? Carbon::parse($lastCron->executed_at)->timezone('America/Sao_Paulo')
+                                                  ->format('d/m/y H:i') : 'No cron executed yet';
+            $memoryUsage      = memory_get_usage();
+            $uptime           = exec('uptime -p');
+
             return response()->json([
-                'error' => 'An error occurred when trying to move the product to the trash',
+                'status_read_db_connection'  => $checkDBReadConnection,
+                'status_write_db_connection' => $checkDBWriteConnection,
+                'last_cron_execution'        => $lastCronExecuted,
+                'memory_usage'               => $memoryUsage,
+                'uptime'                     => $uptime,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error'   => 'An error occurred while processing the request',
                 'message' => $e->getMessage(),
             ], 500);
         }
     }
-    
 
-    public function show($code)
+
+    public function update(ProductUpdateRequest $request, $code)
     {
-        try
-        {
-            $product = Product::where('code', $code)->firstOrFail();
+        try {
+            $data                    = $request->validated();
+            $product                 = Product::query()->where('code', $code)->firstOrFail();
+            $data['last_modified_t'] = now()->timestamp;
+            $product->update($data);
             return response()->json($product, 200);
-    
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) 
-        {
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Product not found',
             ], 404);
-    
-        } catch (\Exception $e)
-        {
+
+        } catch (\Exception $e) {
             return response()->json([
-                'error' => 'An error occurred when trying to search for the product',
+                'error'   => 'Error updating product',
                 'message' => $e->getMessage(),
             ], 500);
         }
     }
-    
+
+
+    public function delete($code)
+    {
+        try {
+            $product = Product::query()->where('code', $code)->firstOrFail();
+
+            $product->update(['status' => 'trash']);
+
+            return response()->json(['status' => 'trash'], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Product not found',
+            ], 404);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error'   => 'An error occurred when trying to move the product to the trash',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function show($code)
+    {
+        try {
+            $product = Product::query()->where('code', $code)->firstOrFail();
+            return response()->json($product, 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Product not found',
+            ], 404);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error'   => 'An error occurred when trying to search for the product',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     public function list(Request $request)
     {
-        try 
-        {
-            $products = Product::paginate(10);
+        try {
+            $products = Product::query()->paginate(10);
             return response()->json($products, 200);
-    
-        } catch (\Exception $e)
-        {
+
+        } catch (\Exception $e) {
             return response()->json([
-                'error' => 'An error occurred while listing products',
+                'error'   => 'An error occurred while listing products',
                 'message' => $e->getMessage(),
             ], 500);
         }
     }
-    
+
 
 }
