@@ -23,13 +23,14 @@ class ProductController extends Controller
             } catch (\Exception $e) {
                 $checkDBReadConnection = 'Failed: ' . $e->getMessage();
             }
-            // Verificar conexão de escrita com o banco de dados
+
             try {
                 DB::connection()->getPdo()->exec('DO 1');
                 $checkDBWriteConnection = 'OK';
             } catch (\Exception $e) {
                 $checkDBWriteConnection = 'Failed: ' . $e->getMessage();
             }
+            
             $lastCron         = CronLog::query()->orderBy('id', 'desc')->first();
             $lastCronExecuted = $lastCron ? Carbon::parse($lastCron->executed_at)->timezone('America/Sao_Paulo')
                                                   ->format('d/m/y H:i') : 'No cron executed yet';

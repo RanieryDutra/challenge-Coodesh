@@ -22,8 +22,8 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::get('/products', [ProductController::class, 'index']);                       //ok
-Route::get('/products/list', [ProductController::class, 'list']);                //ok
+Route::get('/products', [ProductController::class, 'index']);               //ok
+Route::get('/products/list', [ProductController::class, 'list']);           //ok
 Route::put('/products/{code}', [ProductController::class, 'update']);       //ok
 Route::delete('/products/{code}', [ProductController::class, 'delete']);    //ok
 Route::get('/products/{code}', [ProductController::class, 'show']);         //ok

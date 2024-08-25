@@ -13,7 +13,6 @@ class ApiController extends Controller
         $uptime = shell_exec('uptime -p');
         $memoryUsage = memory_get_usage(true);
         $lastCronExecution = Product::latest('executed_at')->first();
-                                // DB::table('cron_logs')->latest('executed_at')->first();
 
         return response()->json([
             'status' => 'OK',

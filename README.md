@@ -53,8 +53,8 @@ Esta API REST foi desenvolvida seguindo as melhores práticas de desenvolvimento
 
 **EndPoints**
 
-º GET api/ 
-    - Detalhes da API verifciação de status.
+º GET api/products
+    - Detalhes da API, verificação de status.
 
 º PUT api/products/{code} 
     - Atualizar informações de um produto.
@@ -65,5 +65,5 @@ Esta API REST foi desenvolvida seguindo as melhores práticas de desenvolvimento
 º GET api/products/{code}
     - Obter detalhes do produto especificado.
 
-º GET api/products
+º GET api/products/list
     - Listar todos os produtos com paginação de 10 por página.
